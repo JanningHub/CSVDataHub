@@ -1,35 +1,110 @@
 package com.jann.csv_data_hub.service;
 
-import com.jann.csv_data_hub.messaging.RabbitConfig;
-//import com.jann.csv_data_hub.repository.TableRepository;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import com.jann.csv_data_hub.exception.error.TableValidationException;
+import com.jann.csv_data_hub.message.tracker.domain.RequestStatus;
+import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerMessage;
+import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
+import com.jann.csv_data_hub.model.ColumnInfo;
+import com.jann.csv_data_hub.model.TableInfo;
+import com.jann.csv_data_hub.repository.TableManagementRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TableManagementService {
 
-//    private final TableRepository tableRepository;
-//
-//    public TableSchemaService(TableRepository tableRepository) {
-//        this.tableRepository = tableRepository;
-//    }
+    private final TableManagementRepository repository;
+    private final RequestTrackerService tracker;
 
-    @RabbitListener(queues = RabbitConfig.TABLE_CREATE_QUEUE)
-    public void createTable(String schemaJson) {
-        //Criar model
-
-        System.out.println("Creating table...");
-
-        // TODO: parse JSON (tableName + columns)
-
-        //tableRepository.createTable(schemaJson);
+    public TableManagementService(TableManagementRepository repository,
+                                  RequestTrackerService tracker) {
+        this.repository = repository;
+        this.tracker = tracker;
     }
 
-    @RabbitListener(queues = RabbitConfig.TABLE_DELETE_QUEUE)
-    public void deleteTable(String tableName) {
+    public void createTable(RequestTrackerMessage<TableInfo> message) {
+        String requestId = message.getRequestId();
 
-        System.out.println("Deleting table: " + tableName);
+        try {
+            tracker.executeStep(requestId, RequestStatus.RUNNING);
 
-        //tableRepository.dropTable(tableName);
+            TableInfo tableInfo = message.getPayload();
+
+            validate(tableInfo);
+
+            repository.createTable(tableInfo);
+
+            tracker.executeStep(requestId, RequestStatus.DONE);
+
+        } catch (Exception ex) {
+            tracker.executeStep(requestId, RequestStatus.FAILED);
+            throw ex;
+        }
+    }
+
+    public TableInfo getTable(String tableName) {
+
+        System.out.println("Searching table: " + tableName);
+
+        validateTableName(tableName);
+
+        return repository.getTableInfo(tableName);
+    }
+
+    public void deleteTable(RequestTrackerMessage<String> message) {
+        String requestId = message.getRequestId();
+
+        try {
+            tracker.executeStep(requestId, RequestStatus.RUNNING);
+
+            String tableName = message.getPayload();
+
+            validateTableName(tableName);
+
+            repository.dropTable(tableName);
+
+            tracker.executeStep(requestId, RequestStatus.DONE);
+
+        } catch (Exception ex) {
+            tracker.executeStep(requestId, RequestStatus.FAILED);
+            throw ex;
+        }
+    }
+
+    private void validate(TableInfo tableInfo) {
+
+        validateTableName(tableInfo.getTableName());
+
+        if (tableInfo.getColumns() == null || tableInfo.getColumns().isEmpty()) {
+            throw new TableValidationException("Table must have at least one column");
+        }
+
+        if (tableInfo.getColumns().size() > 200) {
+            throw new TableValidationException(
+                    "Table exceeds maximum allowed columns (200). Provided: "
+                            + tableInfo.getColumns().size()
+            );
+        }
+
+        for (ColumnInfo col : tableInfo.getColumns()) {
+
+            if (col.getName() == null || !col.getName().matches("^[a-zA-Z0-9_]+$")) {
+                throw new TableValidationException("Invalid column name: " + col.getName());
+            }
+
+            if (col.getType() == null || !col.getType().matches("^[a-zA-Z0-9() ]+$")) {
+                throw new TableValidationException("Invalid column type: " + col.getType());
+            }
+        }
+    }
+
+    private void validateTableName(String tableName) {
+
+        if (tableName == null || tableName.isBlank()) {
+            throw new TableValidationException("Table name cannot be empty");
+        }
+
+        if (!tableName.matches("^[a-zA-Z0-9_]+$")) {
+            throw new TableValidationException("Invalid table name: " + tableName);
+        }
     }
 }

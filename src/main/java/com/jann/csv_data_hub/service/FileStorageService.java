@@ -12,14 +12,21 @@ import java.nio.file.Paths;
 @Service
 public class FileStorageService {
 
+    private final TableManagementService tableManagementService;
+
+    public FileStorageService(TableManagementService tableManagementService) {
+        this.tableManagementService = tableManagementService;
+    }
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public Path save(MultipartFile file) throws IOException {
+    public Path save(MultipartFile file, String tableName) throws IOException {
+        checkTableIfTableExists(tableName);
+
         Files.createDirectories(Paths.get(uploadDir));
 
         String originalName = file.getOriginalFilename();
-
         checkFileType(originalName, file.getContentType());
 
         String fileName = System.currentTimeMillis() + "_" + originalName;
@@ -38,5 +45,9 @@ public class FileStorageService {
         if (contentType != null && !contentType.equals("text/csv") && !contentType.equals("application/vnd.ms-excel")) {
             throw new IllegalArgumentException("Invalid file type: " + contentType);
         }
+    }
+
+    private void checkTableIfTableExists(String tableName) {
+        //tableManagementService.checkIfExists(tableName);
     }
 }
