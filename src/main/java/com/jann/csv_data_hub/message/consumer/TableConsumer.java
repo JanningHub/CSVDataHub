@@ -4,7 +4,7 @@ import com.jann.csv_data_hub.message.config.routing_keys.RabbitRoutingKeys;
 import com.jann.csv_data_hub.message.tracker.domain.RequestStatus;
 import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerMessage;
 import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
-import com.jann.csv_data_hub.model.TableInfo;
+import com.jann.csv_data_hub.model.table.TableInfo;
 import com.jann.csv_data_hub.service.TableManagementService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.jann.csv_data_hub.model;
+package com.jann.csv_data_hub.model.table;
 
 import java.util.List;
 

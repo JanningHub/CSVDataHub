@@ -4,8 +4,8 @@ import com.jann.csv_data_hub.exception.error.TableValidationException;
 import com.jann.csv_data_hub.message.tracker.domain.RequestStatus;
 import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerMessage;
 import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
-import com.jann.csv_data_hub.model.ColumnInfo;
-import com.jann.csv_data_hub.model.TableInfo;
+import com.jann.csv_data_hub.model.table.ColumnInfo;
+import com.jann.csv_data_hub.model.table.TableInfo;
 import com.jann.csv_data_hub.repository.TableManagementRepository;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +60,8 @@ public class TableManagementService {
 
             validateTableName(tableName);
 
+            tableExists(tableName);
+
             repository.dropTable(tableName);
 
             tracker.executeStep(requestId, RequestStatus.DONE);
@@ -105,6 +107,12 @@ public class TableManagementService {
 
         if (!tableName.matches("^[a-zA-Z0-9_]+$")) {
             throw new TableValidationException("Invalid table name: " + tableName);
+        }
+    }
+
+    public void tableExists(String tableName) {
+        if (!repository.tableExists(tableName)) {
+            throw new TableValidationException("Table does not exist: " + tableName);
         }
     }
 }

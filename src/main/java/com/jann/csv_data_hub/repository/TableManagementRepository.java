@@ -1,8 +1,8 @@
 package com.jann.csv_data_hub.repository;
 
 import com.jann.csv_data_hub.exception.error.TableValidationException;
-import com.jann.csv_data_hub.model.ColumnInfo;
-import com.jann.csv_data_hub.model.TableInfo;
+import com.jann.csv_data_hub.model.table.ColumnInfo;
+import com.jann.csv_data_hub.model.table.TableInfo;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -70,5 +70,19 @@ public class TableManagementRepository {
 
         jdbcClient.sql("DROP TABLE IF EXISTS " + tableName)
                 .update();
+    }
+
+    public boolean tableExists(String tableName) {
+        Integer count = jdbcClient.sql("""
+            SELECT COUNT(*)
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_name = :tableName
+        """)
+                .param("tableName", tableName)
+                .query(Integer.class)
+                .single();
+
+        return count != null && count > 0;
     }
 }

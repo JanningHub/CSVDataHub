@@ -32,6 +32,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue cvsIngestionQueue() {
+        return RabbitQueueFactory.createQueue(RabbitRoutingKeys.CSV_INGESTION);
+    }
+
+    @Bean
     public Queue tableCreateDLQ() {
         return RabbitQueueFactory.createDLQ(RabbitRoutingKeys.TABLE_CREATE);
     }
@@ -44,6 +49,11 @@ public class RabbitConfig {
     @Bean
     public Queue tableQueryDLQ() {
         return RabbitQueueFactory.createDLQ(RabbitRoutingKeys.TABLE_QUERY);
+    }
+
+    @Bean
+    public Queue csvIngestionDLQ() {
+        return RabbitQueueFactory.createDLQ(RabbitRoutingKeys.CSV_INGESTION);
     }
 
     @Bean
@@ -68,6 +78,13 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Binding bindIngestion(TopicExchange exchange, Queue csvIngestionQueue) {
+        return BindingBuilder.bind(csvIngestionQueue)
+                .to(exchange)
+                .with(RabbitRoutingKeys.CSV_INGESTION);
+    }
+
+    @Bean
     public Binding bindCreateDLQ(TopicExchange exchange, Queue tableCreateDLQ) {
         return BindingBuilder.bind(tableCreateDLQ)
                 .to(exchange)
@@ -86,6 +103,13 @@ public class RabbitConfig {
         return BindingBuilder.bind(tableQueryDLQ)
                 .to(exchange)
                 .with(RabbitRoutingKeys.dlq(RabbitRoutingKeys.TABLE_QUERY));
+    }
+
+    @Bean
+    public Binding bindIngestionDLQ(TopicExchange exchange, Queue csvIngestionDLQ) {
+        return BindingBuilder.bind(csvIngestionDLQ)
+                .to(exchange)
+                .with(RabbitRoutingKeys.dlq(RabbitRoutingKeys.CSV_INGESTION));
     }
 
     @Bean

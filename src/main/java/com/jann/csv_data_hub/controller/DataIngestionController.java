@@ -1,5 +1,6 @@
 package com.jann.csv_data_hub.controller;
 
+import com.jann.csv_data_hub.model.file_storage.FileStorageInfo;
 import com.jann.csv_data_hub.service.FileStorageService;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class DataIngestionController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadCsv(@RequestParam("file") @NotBlank MultipartFile file,
                                             @RequestParam("tableName") @NotBlank String tableName) throws IOException {
-        Path filePath = fileStorageService.save(file, tableName);
+        FileStorageInfo fileStorageInfo = fileStorageService.save(file, tableName);
 
         //csvMaestroService.sendToQueue(filePath);
         //Nao enviar para o maestro, acho que direto para a ingestao de dados

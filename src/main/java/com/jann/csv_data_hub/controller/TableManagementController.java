@@ -3,7 +3,7 @@ package com.jann.csv_data_hub.controller;
 import com.jann.csv_data_hub.message.producer.TableProducer;
 import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerResponse;
 import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
-import com.jann.csv_data_hub.model.TableInfo;
+import com.jann.csv_data_hub.model.table.TableInfo;
 import com.jann.csv_data_hub.service.TableManagementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
