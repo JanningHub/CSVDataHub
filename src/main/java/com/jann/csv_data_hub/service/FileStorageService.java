@@ -1,5 +1,6 @@
 package com.jann.csv_data_hub.service;
 
+import com.jann.csv_data_hub.exception.error.FileStorageException;
 import com.jann.csv_data_hub.model.file_storage.FileStorageInfo;
 import com.jann.csv_data_hub.repository.FileStorageRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,11 +45,11 @@ public class FileStorageService {
 
     private void checkFileType(String originalName, String contentType) {
         if (originalName == null || !originalName.toLowerCase().endsWith(".csv")) {
-            throw new IllegalArgumentException("Only CSV files are allowed");
+            throw new FileStorageException("Only CSV files are allowed");
         }
 
         if (contentType != null && !contentType.equals("text/csv") && !contentType.equals("application/vnd.ms-excel")) {
-            throw new IllegalArgumentException("Invalid file type: " + contentType);
+            throw new FileStorageException("Invalid file type: " + contentType);
         }
     }
 }

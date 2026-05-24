@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class FileStorageRepository extends JpaRepository<FileStorageInfo, String> {
+public abstract class FileStorageRepository implements JpaRepository<FileStorageInfo, String> {
 }

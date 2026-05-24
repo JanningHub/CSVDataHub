@@ -1,5 +1,6 @@
 package com.jann.csv_data_hub.controller;
 
+import com.jann.csv_data_hub.message.producer.IngestionProducer;
 import com.jann.csv_data_hub.model.file_storage.FileStorageInfo;
 import com.jann.csv_data_hub.service.FileStorageService;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 @Validated
 @RestController
@@ -20,9 +20,11 @@ import java.nio.file.Path;
 public class DataIngestionController {
 
     private final FileStorageService fileStorageService;
+    private final IngestionProducer producer;
 
-    public DataIngestionController(FileStorageService fileStorageService) {
+    public DataIngestionController(FileStorageService fileStorageService, IngestionProducer producer) {
         this.fileStorageService = fileStorageService;
+        this.producer = producer;
     }
 
     @PostMapping("/upload")
@@ -30,10 +32,13 @@ public class DataIngestionController {
                                             @RequestParam("tableName") @NotBlank String tableName) throws IOException {
         FileStorageInfo fileStorageInfo = fileStorageService.save(file, tableName);
 
-        //csvMaestroService.sendToQueue(filePath);
-        //Nao enviar para o maestro, acho que direto para a ingestao de dados
+        String requestId = producer.process(fileStorageInfo);
 
-        return ResponseEntity.accepted()
-                .body("File received and queued for processing");
+        String response = String.format(
+                "File received and queued for processing. Request ID: %s",
+                requestId
+        );
+
+        return ResponseEntity.accepted().body(response);
     }
 }

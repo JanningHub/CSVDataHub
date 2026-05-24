@@ -1,6 +1,7 @@
 package com.jann.csv_data_hub.service;
 
 import com.jann.csv_data_hub.exception.error.TableValidationException;
+import com.jann.csv_data_hub.mapper.SqlTypeMapper;
 import com.jann.csv_data_hub.message.tracker.domain.RequestStatus;
 import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerMessage;
 import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
@@ -93,7 +94,13 @@ public class TableManagementService {
                 throw new TableValidationException("Invalid column name: " + col.getName());
             }
 
-            if (col.getType() == null || !col.getType().matches("^[a-zA-Z0-9() ]+$")) {
+            if (col.getType() == null) {
+                throw new TableValidationException("Column type cannot be null");
+            }
+
+            try {
+                SqlTypeMapper.toSqlType(col.getType());
+            } catch (IllegalArgumentException e) {
                 throw new TableValidationException("Invalid column type: " + col.getType());
             }
         }
