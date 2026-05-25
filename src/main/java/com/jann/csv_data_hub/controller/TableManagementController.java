@@ -1,8 +1,6 @@
 package com.jann.csv_data_hub.controller;
 
 import com.jann.csv_data_hub.message.producer.TableProducer;
-import com.jann.csv_data_hub.message.tracker.dto.RequestTrackerResponse;
-import com.jann.csv_data_hub.message.tracker.service.RequestTrackerService;
 import com.jann.csv_data_hub.model.table.TableInfo;
 import com.jann.csv_data_hub.service.TableManagementService;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +18,11 @@ public class TableManagementController {
 
     private final TableManagementService tableManagementService;
     private final TableProducer producer;
-    private final RequestTrackerService requestTrackerService;
 
     public TableManagementController(TableManagementService tableManagementService,
-                                     TableProducer producer,
-                                     RequestTrackerService requestTrackerService) {
+                                     TableProducer producer) {
         this.tableManagementService = tableManagementService;
         this.producer = producer;
-        this.requestTrackerService = requestTrackerService;
     }
 
     @PostMapping
@@ -64,10 +59,5 @@ public class TableManagementController {
         );
 
         return ResponseEntity.accepted().body(response);
-    }
-
-    @GetMapping("/request-status/{id}")
-    public ResponseEntity<RequestTrackerResponse> requestStatus(@PathVariable String id) {
-        return ResponseEntity.ok(requestTrackerService.getRequestTracker(id));
     }
 }

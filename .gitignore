@@ -3,6 +3,7 @@ HELP.md
 target/
 build/
 out/
+uploads/
 *.class
 *.jar
 *.war

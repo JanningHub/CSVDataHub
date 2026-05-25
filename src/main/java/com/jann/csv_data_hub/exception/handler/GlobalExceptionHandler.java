@@ -46,6 +46,12 @@ public class GlobalExceptionHandler {
                 .body("File Storage error: " + ex.getMessage());
     }
 
+    @ExceptionHandler(RequestTrackerException.class)
+    public ResponseEntity<String> handleRequestTracker(RequestTrackerException ex) {
+        return ResponseEntity.status(500)
+                .body("Request Tracker error: " + ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneric(Exception ex) {
         return ResponseEntity.status(500)
