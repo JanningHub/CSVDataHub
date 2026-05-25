@@ -27,13 +27,16 @@ public class DataIngestionService {
     private final DataIngestionRepository repository;
     private final TableMetadataService metadataService;
     private final RequestTrackerService tracker;
+    private final FileStorageService fileStorageService;
 
     public DataIngestionService(DataIngestionRepository repository,
                                 TableMetadataService metadataService,
-                                RequestTrackerService tracker) {
+                                RequestTrackerService tracker,
+                                FileStorageService fileStorageService) {
         this.repository = repository;
         this.metadataService = metadataService;
         this.tracker = tracker;
+        this.fileStorageService = fileStorageService;
     }
 
     public void process(RequestTrackerMessage<FileStorageInfo> message) {
@@ -52,6 +55,9 @@ public class DataIngestionService {
                 repository.copyInsert(tableName, is);
 
                 tracker.executeStep(requestId, RequestStatus.DONE);
+
+                fileStorageService.deleteFile(path);
+
                 return;
 
             } catch (Exception copyError) {
@@ -90,6 +96,8 @@ public class DataIngestionService {
                 }
 
                 tracker.executeStep(requestId, RequestStatus.DONE);
+
+                fileStorageService.deleteFile(path);
 
             } catch (Exception e) {
                 tracker.executeStep(requestId, RequestStatus.FAILED);

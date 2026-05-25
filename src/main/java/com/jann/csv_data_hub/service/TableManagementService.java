@@ -74,8 +74,13 @@ public class TableManagementService {
     }
 
     private void validate(TableInfo tableInfo) {
+        String tableName = tableInfo.getTableName();
 
-        validateTableName(tableInfo.getTableName());
+        if (repository.tableExists(tableName)) {
+            throw new TableValidationException("Table already exists: " + tableName);
+        }
+
+        validateTableName(tableName);
 
         if (tableInfo.getColumns() == null || tableInfo.getColumns().isEmpty()) {
             throw new TableValidationException("Table must have at least one column");

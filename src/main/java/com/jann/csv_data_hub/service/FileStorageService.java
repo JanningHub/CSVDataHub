@@ -52,4 +52,16 @@ public class FileStorageService {
             throw new FileStorageException("Invalid file type: " + contentType);
         }
     }
+
+    public void deleteFile(Path path) {
+        try {
+            if (!Files.exists(path)) {
+                throw new FileStorageException("File does not exist: " + path.getFileName());
+            }
+
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new FileStorageException("Error deleting file: " + path.getFileName(), e);
+        }
+    }
 }
