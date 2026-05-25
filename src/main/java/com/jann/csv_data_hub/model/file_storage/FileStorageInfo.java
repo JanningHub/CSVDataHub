@@ -5,8 +5,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.nio.file.Path;
-
 @Entity
 public class FileStorageInfo {
 
@@ -14,23 +12,23 @@ public class FileStorageInfo {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private Path filePath;
+    private String filePath;
 
     private String tableName;
 
     public FileStorageInfo() {
     }
 
-    public FileStorageInfo(Path filePath, String tableName) {
+    public FileStorageInfo(String filePath, String tableName) {
         this.filePath = filePath;
         this.tableName = tableName;
     }
 
-    public Path getFilePath() {
+    public String getFilePath() {
         return filePath;
     }
 
-    public void setFilePath(Path filePath) {
+    public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 

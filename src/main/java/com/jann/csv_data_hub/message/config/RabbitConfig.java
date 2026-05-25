@@ -32,7 +32,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue cvsIngestionQueue() {
+    public Queue csvIngestionQueue() {
         return RabbitQueueFactory.createQueue(RabbitRoutingKeys.CSV_INGESTION);
     }
 
@@ -134,6 +134,8 @@ public class RabbitConfig {
 
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(converter);
+
+        factory.setDefaultRequeueRejected(false);
 
         return factory;
     }

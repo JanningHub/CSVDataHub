@@ -19,6 +19,9 @@ services:
       SPRING_RABBITMQ_PASSWORD: guest
 
       FILE_UPLOAD_DIR: /var/app/uploads
+
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 10GB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 10GB
     volumes:
       - ./uploads:/var/app/uploads
     networks:

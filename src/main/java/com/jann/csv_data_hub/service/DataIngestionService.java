@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,12 +41,13 @@ public class DataIngestionService {
         FileStorageInfo fileStorageInfo = message.getPayload();
 
         String tableName = fileStorageInfo.getTableName();
+        Path path = Paths.get(fileStorageInfo.getFilePath());
         var columns = metadataService.getColumns(tableName);
 
         try {
             tracker.executeStep(requestId, RequestStatus.RUNNING);
 
-            try (InputStream is = Files.newInputStream(fileStorageInfo.getFilePath())) {
+            try (InputStream is = Files.newInputStream(path)) {
 
                 repository.copyInsert(tableName, is);
 
@@ -55,7 +58,7 @@ public class DataIngestionService {
                 System.err.println("COPY failed, fallback to batch");
             }
 
-            try (BufferedReader reader = Files.newBufferedReader(fileStorageInfo.getFilePath())) {
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
 
                 String headerLine = reader.readLine();
                 validateHeader(headerLine, columns);

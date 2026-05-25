@@ -28,7 +28,7 @@ public class DataIngestionController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadCsv(@RequestParam("file") @NotBlank MultipartFile file,
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file,
                                             @RequestParam("tableName") @NotBlank String tableName) throws IOException {
         FileStorageInfo fileStorageInfo = fileStorageService.save(file, tableName);
 

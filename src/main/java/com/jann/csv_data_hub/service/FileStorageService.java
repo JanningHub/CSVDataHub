@@ -40,7 +40,7 @@ public class FileStorageService {
         Path filePath = Paths.get(uploadDir, fileName);
         file.transferTo(filePath);
 
-        return fileStorageRepository.save(new FileStorageInfo(filePath, tableName));
+        return fileStorageRepository.save(new FileStorageInfo(filePath.toString(), tableName));
     }
 
     private void checkFileType(String originalName, String contentType) {
