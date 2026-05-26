@@ -1,5 +1,6 @@
 package com.jann.csv_data_hub.service;
 
+import com.jann.csv_data_hub.exception.error.DataQueryAnalyticsException;
 import com.jann.csv_data_hub.model.data_query.DataQueryResponse;
 import com.jann.csv_data_hub.model.table.TableInfo;
 import com.jann.csv_data_hub.repository.DataQueryRepository;
@@ -19,15 +20,23 @@ public class DataQueryService {
     }
 
     public DataQueryResponse getData(String tableName, boolean includeTableInfo, Pageable pageable) {
-        TableInfo tableInfo = null;
+        try {
+            TableInfo tableInfo = null;
 
-        if (includeTableInfo) {
-            tableInfo = tableManagementService.getTable(tableName);
+            if (includeTableInfo) {
+                tableInfo = tableManagementService.getTable(tableName);
+            }
+
+            return new DataQueryResponse(
+                    tableInfo,
+                    dataQueryRepository.getData(tableName, pageable)
+            );
+
+        } catch (Exception e) {
+            throw new DataQueryAnalyticsException(
+                    "Error while fetching data for table: " + tableName,
+                    e
+            );
         }
-
-        return new DataQueryResponse(
-                tableInfo,
-                dataQueryRepository.getData(tableName, pageable)
-        );
     }
 }

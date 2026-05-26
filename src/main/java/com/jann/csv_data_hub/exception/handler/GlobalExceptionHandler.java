@@ -52,6 +52,12 @@ public class GlobalExceptionHandler {
                 .body("Request Tracker error: " + ex.getMessage());
     }
 
+    @ExceptionHandler(DataQueryAnalyticsException.class)
+    public ResponseEntity<String> handleQueryAnalytics(DataQueryAnalyticsException ex) {
+        return ResponseEntity.status(500)
+                .body("Data Query Analytics error: " + ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneric(Exception ex) {
         return ResponseEntity.status(500)
